@@ -58,11 +58,33 @@ public class UserService {
         }
     }
 
-    public List<Group> findGroupsForUser(User user){
+//    public List<Group> findGroupsForUser(User user){
+//        List<UserGroup> userGroups = userGroupRepository.findByUser(user);
+//        List<Group> groups = new ArrayList<>();
+//        for(int i=0;i<userGroups.size();i++){
+//            groups.add(userGroups.get(i).getGroup());
+//        }
+//        return groups;
+//    }
+
+    public List<Group> findGroupsForUserWhereAdmin(User user){
         List<UserGroup> userGroups = userGroupRepository.findByUser(user);
         List<Group> groups = new ArrayList<>();
         for(int i=0;i<userGroups.size();i++){
-            groups.add(userGroups.get(i).getGroup());
+            if(userGroups.get(i).getRole().getName().equals("ADMIN")){
+                groups.add(userGroups.get(i).getGroup());
+            }
+        }
+        return groups;
+    }
+
+    public List<Group> findGroupsForUserWhereUser(User user){
+        List<UserGroup> userGroups = userGroupRepository.findByUser(user);
+        List<Group> groups = new ArrayList<>();
+        for(int i=0;i<userGroups.size();i++){
+            if(userGroups.get(i).getRole().getName().equals("USER")){
+                groups.add(userGroups.get(i).getGroup());
+            }
         }
         return groups;
     }

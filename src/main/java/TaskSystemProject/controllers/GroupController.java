@@ -28,7 +28,7 @@ public class GroupController {
     }
 
     @PostMapping("/addMember/{groupId}")
-    public ResponseEntity<Object> addMember(Authentication authentication,@PathVariable Long groupId,@RequestBody String email){
+    public ResponseEntity<Object> addMember(Authentication authentication,@PathVariable Long groupId,@RequestParam String email){
         Group group = groupService.findById(groupId);
         User user = userService.findUser(email);
         if (!groupService.getGroupAdmin(group).getEmail().equals(authentication.getName())) {
@@ -46,8 +46,8 @@ public class GroupController {
     }
 
 
-    @DeleteMapping("deleteUserAtGroup/{groupId}")
-    public ResponseEntity<Object> deleteUserAtGroup(Authentication authentication,@PathVariable Long groupId,@RequestBody String email){
+    @DeleteMapping("/deleteUserAtGroup/{groupId}")
+    public ResponseEntity<Object> deleteUserAtGroup(Authentication authentication,@PathVariable Long groupId,@RequestParam String email){
         Group group = groupService.findById(groupId);
         User user = userService.findUser(email);
         if (!groupService.getGroupAdmin(group).getEmail().equals(authentication.getName())) {
@@ -58,7 +58,7 @@ public class GroupController {
                 group.getName(),HttpStatus.OK);
     }
 
-    @DeleteMapping("deleteGroup/{groupId}")
+    @DeleteMapping("/deleteGroup/{groupId}")
     public ResponseEntity<Object> deleteGroup(Authentication authentication,@PathVariable Long groupId){
         Group group = groupService.findById(groupId);
         if (!groupService.getGroupAdmin(group).getEmail().equals(authentication.getName())) {

@@ -34,7 +34,7 @@ public class TaskController {
         return new ResponseEntity<>("Task addedd successfully to group "+group.getName(),HttpStatus.OK);
     }
 
-    @PostMapping("/addTaskToUser/{groupId}")
+    @PostMapping("/addTaskToUser/{groupId}/{userEmail}")
     public ResponseEntity<Object> addTaskToUser(Authentication authentication,
                                                 @RequestBody Task task,@PathVariable Long groupId,
                                               @PathVariable String userEmail){
@@ -48,23 +48,30 @@ public class TaskController {
                 " for user "+user.getEmail(),HttpStatus.OK);
     }
 
-    @PostMapping("/changeStatus")
-    public ResponseEntity<Object> changeStatus(@PathVariable Long taskId){
+    @PostMapping("/changeStatus/{taskId}")
+    public ResponseEntity<Object> changeStatus(Authentication authentication,@PathVariable Long taskId){
+        if(!authentication.isAuthenticated()){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         Task task = taskService.findById(taskId);
         taskService.changeStatus(task);
         return new ResponseEntity<>("Task status changed to "+task.getStatus(),HttpStatus.OK);
     }
 
     @GetMapping("getAllTasksAtGroup/{groupId}")
-    public ResponseEntity<List<Task>> getAllTasks(@PathVariable Long groupId){
+    public ResponseEntity<List<Task>> getAllTasks(Authentication authentication,@PathVariable Long groupId){
+        if(!authentication.isAuthenticated()){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         Group group = groupService.findById(groupId);
         List<Task> tasks = taskService.findByGroup(group);
         return new ResponseEntity<>(tasks,HttpStatus.OK);
     }
 
-    @GetMapping("getAllTasksAtGroupForAUser/{groupId}/{userEmail}")
+    @GetMapping("getAllTasksAtGroupForAUser/{groupId}")
     public ResponseEntity<List<Task>> getAllTasksForAUser(@PathVariable Long groupId,
-                                                  @PathVariable String userEmail){
+                                                  Authentication authentication){
+        String userEmail = authentication.getName();
         Group group = groupService.findById(groupId);
         User user = userService.findUser(userEmail);
         List<Task> tasks = taskService.findByGroupAndUser(group,user);

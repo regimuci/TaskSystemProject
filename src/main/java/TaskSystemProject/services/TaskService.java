@@ -11,6 +11,7 @@ import TaskSystemProject.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +66,14 @@ public class TaskService {
     }
 
     public List<Task> findByGroup(Group group){
-        return taskRepository.findByGroup(group);
+        List<Task> tasks =  taskRepository.findByGroup(group);
+        List<Task> t = new ArrayList<>();
+        for(int i = 0; i<tasks.size(); i++){
+            if(tasks.get(i).getUser()==null){
+                t.add(tasks.get(i));
+            }
+        }
+        return t;
     }
 
     public List<Task> findByGroupAndUser(Group group,User user){

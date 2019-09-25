@@ -8,6 +8,7 @@ import TaskSystemProject.repositories.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -17,6 +18,7 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     public void addComment(Task task,User user,Comment comment){
+        comment.setDate(new Date().toString());
         comment.setTask(task);
         comment.setUser(user);
         commentRepository.save(comment);

@@ -2,14 +2,21 @@ package TaskSystemProject.controllers;
 
 import TaskSystemProject.entities.Group;
 import TaskSystemProject.entities.User;
+import TaskSystemProject.services.UserDetailsServiceImpl;
 import TaskSystemProject.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -33,12 +40,28 @@ public class UserController {
         return new ResponseEntity<Object>("Password changed successfully",HttpStatus.OK);
     }
 
-    @GetMapping("/findGroupsForUser")
-    public ResponseEntity<List<Group>> findByUser(Authentication authentication){
+    @GetMapping("/findGroupsForUserWhereRoleAdmin")
+    public ResponseEntity<List<Group>> findGroupsForUserWhereAdmin(Authentication authentication){
         String email = authentication.getName();
         User user = userService.findUser(email);
-        List<Group> groups = userService.findGroupsForUser(user);
+        List<Group> groups = userService.findGroupsForUserWhereAdmin(user);
         return new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
     }
+
+    @GetMapping("/findGroupsForUserWhereRoleUser")
+    public ResponseEntity<List<Group>> findGroupsForUserWhereUser(Authentication authentication){
+        String email = authentication.getName();
+        User user = userService.findUser(email);
+        List<Group> groups = userService.findGroupsForUserWhereUser(user);
+        return new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
+    }
+
+    //    @GetMapping("/findGroupsForUser")
+//    public ResponseEntity<List<Group>> findByUser(Authentication authentication){
+//        String email = authentication.getName();
+//        User user = userService.findUser(email);
+//        List<Group> groups = userService.findGroupsForUser(user);
+//        return new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
+//    }
 
 }

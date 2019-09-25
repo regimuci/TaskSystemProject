@@ -3,9 +3,13 @@ package TaskSystemProject.exceptions;
 import TaskSystemProject.entities.Comment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.io.IOException;
 
 @ControllerAdvice
 public class AppExceptionHandler {
@@ -50,6 +54,8 @@ public class AppExceptionHandler {
         return new ResponseEntity<String>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
     }
 
-
-
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public ResponseEntity<String> handleUserException(UsernameNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
 }

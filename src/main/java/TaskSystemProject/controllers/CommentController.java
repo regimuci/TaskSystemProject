@@ -42,7 +42,10 @@ public class CommentController {
     }
 
     @GetMapping("/getCommentsForTask/{taskId}")
-    public ResponseEntity<List<Comment>> getCommentsForTask(@PathVariable Long taskId){
+    public ResponseEntity<List<Comment>> getCommentsForTask(Authentication authentication,@PathVariable Long taskId){
+        if(!authentication.isAuthenticated()){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         Task task = taskService.findById(taskId);
         List<Comment> comments = commentService.findCommentsForTask(task);
         return new ResponseEntity<>(comments,HttpStatus.OK);
