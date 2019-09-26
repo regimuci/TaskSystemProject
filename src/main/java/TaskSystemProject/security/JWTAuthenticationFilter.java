@@ -1,7 +1,5 @@
 package TaskSystemProject.security;
 
-
-
 import TaskSystemProject.entities.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
