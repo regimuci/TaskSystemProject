@@ -58,4 +58,10 @@ public class UserController {
 //        return new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
 //    }
 
+//    @GetMapping("/getUser/{email}")
+//    public ResponseEntity<User> getUserByEmail(@PathVariable String email){
+//        User user = userService.findUser(email);
+//        return new ResponseEntity<User>(user,HttpStatus.OK);
+//    }
+
 }

@@ -2,6 +2,7 @@ package TaskSystemProject.controllers;
 
 import TaskSystemProject.entities.*;
 import TaskSystemProject.exceptions.UnauthorizedException;
+import TaskSystemProject.exceptions.UserNotFoundException;
 import TaskSystemProject.services.GroupService;
 import TaskSystemProject.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,12 @@ public class GroupController {
     }
 
     @GetMapping("/findUsersForGroup/{groupId}")
-    public ResponseEntity<List<User>> findUsersForGroup(@PathVariable Long groupId){
+    public ResponseEntity<List<User>> findUsersForGroup(Authentication authentication,@PathVariable Long groupId){
         Group group = groupService.findById(groupId);
         List<User> users = groupService.findUsersForGroup(group);
+        if(!users.contains(userService.findUser(authentication.getName()))){
+            throw new UnauthorizedException("You are not part of this group");
+        }
         return new ResponseEntity<>(users,HttpStatus.OK);
     }
 
@@ -52,6 +56,9 @@ public class GroupController {
         User user = userService.findUser(email);
         if (!groupService.getGroupAdmin(group).getEmail().equals(authentication.getName())) {
             throw new UnauthorizedException("No authorization");
+        }
+        if(!userService.findGroupsForUser(user).contains(group)){
+            throw new UserNotFoundException("User is not part of this group");
         }
         groupService.deleteUserAtGroup(group,user);
         return new ResponseEntity<>("User "+ email +" deleted successfully from group " +

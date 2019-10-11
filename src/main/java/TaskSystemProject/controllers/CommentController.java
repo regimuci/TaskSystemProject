@@ -3,6 +3,7 @@ package TaskSystemProject.controllers;
 import TaskSystemProject.entities.Comment;
 import TaskSystemProject.entities.Task;
 import TaskSystemProject.entities.User;
+import TaskSystemProject.exceptions.UnauthorizedException;
 import TaskSystemProject.services.CommentService;
 import TaskSystemProject.services.TaskService;
 import TaskSystemProject.services.UserService;
@@ -29,6 +30,9 @@ public class CommentController {
         String userEmail = authentication.getName();
         Task task = taskService.findById(taskId);
         User user = userService.findUser(userEmail);
+        if(!userService.findGroupsForUser(user).contains(task.getGroup())){
+            throw new UnauthorizedException("You are not part of this group so cannot add a comment at task");
+        }
         commentService.addComment(task,user,comment);
         return new ResponseEntity<>("Success",HttpStatus.OK);
     }
@@ -46,7 +50,11 @@ public class CommentController {
         if(!authentication.isAuthenticated()){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+        User user = userService.findUser(authentication.getName());
         Task task = taskService.findById(taskId);
+        if(!userService.findGroupsForUser(user).contains(task.getGroup())){
+            throw new UnauthorizedException("You are not part of this group so cannot see this task comments");
+        }
         List<Comment> comments = commentService.findCommentsForTask(task);
         return new ResponseEntity<>(comments,HttpStatus.OK);
     }

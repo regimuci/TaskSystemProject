@@ -54,6 +54,10 @@ public class TaskController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         Task task = taskService.findById(taskId);
+        Group group = task.getGroup();
+        if(!userService.findGroupsForUser(userService.findUser(authentication.getName())).contains(group)){
+            throw new UnauthorizedException("You are not part of this group so cannot change task status");
+        }
         taskService.changeStatus(task);
         return new ResponseEntity<>("Task status changed to "+task.getStatus(),HttpStatus.OK);
     }
@@ -64,6 +68,10 @@ public class TaskController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         Group group = groupService.findById(groupId);
+        List<User> users = groupService.findUsersForGroup(group);
+        if(!users.contains(userService.findUser(authentication.getName()))){
+            throw new UnauthorizedException("You are not part of this group");
+        }
         List<Task> tasks = taskService.findByGroup(group);
         return new ResponseEntity<>(tasks,HttpStatus.OK);
     }

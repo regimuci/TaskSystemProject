@@ -4,6 +4,7 @@ import TaskSystemProject.entities.Comment;
 import TaskSystemProject.entities.Task;
 import TaskSystemProject.entities.User;
 import TaskSystemProject.exceptions.CommentNotExistException;
+import TaskSystemProject.exceptions.UnauthorizedException;
 import TaskSystemProject.repositories.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,22 @@ public class CommentService {
         if(commentRepository.findById(commentId).get().getUser().getEmail().equals(user.getEmail())){
             commentRepository.deleteById(commentId);
         }
-
+        else {
+            throw new UnauthorizedException("You cannot delete other user comment");
+        }
     }
 
     public List<Comment> findCommentsForTask(Task task){
         return commentRepository.findByTask(task);
+    }
+
+    public Comment findById(Long id){
+        if(commentRepository.findById(id).isPresent()){
+            return commentRepository.findById(id).get();
+        }
+        else {
+            throw new CommentNotExistException("Comment not found");
+        }
     }
 
 

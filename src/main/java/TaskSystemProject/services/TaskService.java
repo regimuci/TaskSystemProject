@@ -9,6 +9,7 @@ import TaskSystemProject.exceptions.UserNotFoundException;
 import TaskSystemProject.repositories.GroupRepository;
 import TaskSystemProject.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class TaskService {
         taskRepository.save(task);
     }
 
+    //@Cacheable(value = "tasksCache",key = "#id")
     public Task findById(Long id){
         if(!existsTaks(id)){
             throw new TaskNotFoundException("Task with id = "+id+" doesn't exist");
@@ -58,11 +60,7 @@ public class TaskService {
     }
 
     public boolean existsTaks(Long id){
-        Optional<Task> task = taskRepository.findById(id);
-        if(task.isPresent()){
-            return true;
-        }
-        return false;
+        return taskRepository.findById(id).isPresent();
     }
 
     public List<Task> findByGroup(Group group){

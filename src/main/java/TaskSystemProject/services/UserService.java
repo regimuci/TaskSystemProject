@@ -9,6 +9,10 @@ import TaskSystemProject.exceptions.UserNotFoundException;
 import TaskSystemProject.repositories.UserGroupRepository;
 import TaskSystemProject.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,49 +27,35 @@ public class UserService {
     @Autowired
     private UserGroupRepository userGroupRepository;
 
-    public void createUser(User user){
+    //@CachePut(value = "usersCache",key = "#user.email")
+    public User createUser(User user){
         if(userRepository.findById(user.getEmail()).isPresent()){
             throw new UserExistException("User with email: "+user.getEmail()+" exists");
         }
         BCryptPasswordEncoder encoder = new  BCryptPasswordEncoder();
         user.setPassword(encoder.encode(user.getPassword()));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
+    //@Cacheable(value = "usersCache",key = "#email")
     public User findUser(String email){
-        if(!isUserPresent(email)){
+        if(!userRepository.findById(email).isPresent()){
             throw new UserNotFoundException("User with email: "+email+" doesn't exist");
         }
         return userRepository.findById(email).get();
     }
 
-    public boolean isUserPresent(String email){
-        Optional<User> u = userRepository.findById(email);
-        if(u.isPresent()){
-            return true;
-        }
-        return false;
-    }
-
-    public void changePassword(User user,String oldPassword,String newPassword){
-        BCryptPasswordEncoder encoder = new  BCryptPasswordEncoder();
+    //@CachePut(value = "usersCache",key = "#user.email")
+    public User changePassword(User user,String oldPassword,String newPassword){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if(encoder.matches(oldPassword,user.getPassword())){
             user.setPassword(encoder.encode(newPassword));
-            userRepository.save(user);
+            return userRepository.save(user);
         }
         else{
             throw new PasswordNotMatchException("Old password is wrong");
         }
     }
-
-//    public List<Group> findGroupsForUser(User user){
-//        List<UserGroup> userGroups = userGroupRepository.findByUser(user);
-//        List<Group> groups = new ArrayList<>();
-//        for(int i=0;i<userGroups.size();i++){
-//            groups.add(userGroups.get(i).getGroup());
-//        }
-//        return groups;
-//    }
 
     public List<Group> findGroupsForUserWhereAdmin(User user){
         List<UserGroup> userGroups = userGroupRepository.findByUser(user);
@@ -85,6 +75,15 @@ public class UserService {
             if(userGroups.get(i).getRole().getName().equals("USER")){
                 groups.add(userGroups.get(i).getGroup());
             }
+        }
+        return groups;
+    }
+
+        public List<Group> findGroupsForUser(User user){
+        List<UserGroup> userGroups = userGroupRepository.findByUser(user);
+        List<Group> groups = new ArrayList<>();
+        for(int i=0;i<userGroups.size();i++){
+            groups.add(userGroups.get(i).getGroup());
         }
         return groups;
     }
